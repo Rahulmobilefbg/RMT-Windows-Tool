@@ -1,4 +1,5 @@
 using System;
+using System.IO.Ports;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -20,81 +21,86 @@ namespace RMTNative
         private ListBox portList;
         private Label statusLabel;
         private Button refreshButton;
+        private Label infoLabel;
 
         public RMTMainForm()
         {
-            Text = "RMT WINDOWS TOOL";
-            Size = new Size(800, 500);
+            Text = "RMT Windows Tool";
+            Size = new Size(760, 520);
             StartPosition = FormStartPosition.CenterScreen;
-            BackColor = Color.FromArgb(24, 24, 30);
+            BackColor = Color.FromArgb(18, 22, 30);
             ForeColor = Color.White;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
 
-            Label title = new Label
-            {
-                Text = "RMT WINDOWS TOOL",
-                Font = new Font("Segoe UI", 22, FontStyle.Bold),
-                ForeColor = Color.DeepSkyBlue,
-                Location = new Point(25, 20),
-                Size = new Size(700, 50)
-            };
-            Controls.Add(title);
+            Panel header = new Panel();
+            header.Dock = DockStyle.Top;
+            header.Height = 100;
+            header.BackColor = Color.FromArgb(25, 35, 48);
+            Controls.Add(header);
 
-            Label subtitle = new Label
-            {
-                Text = "USB / COM PORT DIAGNOSTIC",
-                Font = new Font("Segoe UI", 11),
-                ForeColor = Color.LightGray,
-                Location = new Point(30, 75),
-                Size = new Size(500, 30)
-            };
-            Controls.Add(subtitle);
+            Label title = new Label();
+            title.Text = "RMT WINDOWS TOOL";
+            title.Font = new Font("Segoe UI", 22, FontStyle.Bold);
+            title.ForeColor = Color.DeepSkyBlue;
+            title.Location = new Point(25, 15);
+            title.Size = new Size(700, 45);
+            header.Controls.Add(title);
 
-            Label portHeading = new Label
-            {
-                Text = "Detected COM Ports",
-                Font = new Font("Segoe UI", 12, FontStyle.Bold),
-                Location = new Point(30, 125),
-                Size = new Size(300, 30)
-            };
+            Label subtitle = new Label();
+            subtitle.Text = "MOBILE DEVICE DIAGNOSTIC";
+            subtitle.Font = new Font("Segoe UI", 10);
+            subtitle.ForeColor = Color.LightGray;
+            subtitle.Location = new Point(30, 62);
+            subtitle.Size = new Size(500, 25);
+            header.Controls.Add(subtitle);
+
+            Label portHeading = new Label();
+            portHeading.Text = "USB / COM PORT DETECTION";
+            portHeading.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+            portHeading.ForeColor = Color.White;
+            portHeading.Location = new Point(25, 120);
+            portHeading.Size = new Size(400, 30);
             Controls.Add(portHeading);
 
-            portList = new ListBox
-            {
-                Location = new Point(30, 165),
-                Size = new Size(700, 200),
-                BackColor = Color.FromArgb(40, 40, 48),
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 11)
-            };
+            portList = new ListBox();
+            portList.Location = new Point(25, 160);
+            portList.Size = new Size(690, 240);
+            portList.BackColor = Color.FromArgb(32, 38, 48);
+            portList.ForeColor = Color.White;
+            portList.Font = new Font("Segoe UI", 11);
+            portList.BorderStyle = BorderStyle.FixedSingle;
             Controls.Add(portList);
 
-            refreshButton = new Button
-            {
-                Text = "REFRESH PORTS",
-                Location = new Point(30, 385),
-                Size = new Size(180, 45),
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                BackColor = Color.DeepSkyBlue,
-                ForeColor = Color.Black,
-                FlatStyle = FlatStyle.Flat
-            };
-
+            refreshButton = new Button();
+            refreshButton.Text = "REFRESH DEVICES";
+            refreshButton.Location = new Point(25, 420);
+            refreshButton.Size = new Size(200, 45);
+            refreshButton.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+            refreshButton.BackColor = Color.DeepSkyBlue;
+            refreshButton.ForeColor = Color.Black;
+            refreshButton.FlatStyle = FlatStyle.Flat;
             refreshButton.Click += RefreshPorts;
             Controls.Add(refreshButton);
 
-            statusLabel = new Label
-            {
-                Text = "Ready",
-                Location = new Point(30, 440),
-                Size = new Size(700, 25),
-                ForeColor = Color.LightGreen
-            };
+            infoLabel = new Label();
+            infoLabel.Text = "USB diagnostic and COM port monitoring";
+            infoLabel.Location = new Point(250, 430);
+            infoLabel.Size = new Size(450, 25);
+            infoLabel.ForeColor = Color.LightGray;
+            Controls.Add(infoLabel);
+
+            statusLabel = new Label();
+            statusLabel.Text = "STATUS: READY";
+            statusLabel.Location = new Point(25, 475);
+            statusLabel.Size = new Size(700, 25);
+            statusLabel.ForeColor = Color.LightGreen;
             Controls.Add(statusLabel);
 
             RefreshPortList();
         }
 
-        private void RefreshPorts(object? sender, EventArgs e)
+        private void RefreshPorts(object sender, EventArgs e)
         {
             RefreshPortList();
         }
@@ -105,30 +111,32 @@ namespace RMTNative
 
             try
             {
-                string[] ports =
-                    System.IO.Ports.SerialPort.GetPortNames();
-
+                string[] ports = SerialPort.GetPortNames();
                 Array.Sort(ports);
 
                 if (ports.Length == 0)
                 {
                     portList.Items.Add("No COM ports detected.");
-                    statusLabel.Text = "No COM ports detected.";
+                    statusLabel.Text = "STATUS: NO COM PORT FOUND";
+                    statusLabel.ForeColor = Color.Orange;
                 }
                 else
                 {
                     foreach (string port in ports)
                     {
-                        portList.Items.Add("Detected: " + port);
+                        portList.Items.Add("USB SERIAL DEVICE  |  " + port);
                     }
 
                     statusLabel.Text =
-                        ports.Length + " COM port(s) detected.";
+                        "STATUS: " + ports.Length + " COM PORT(S) DETECTED";
+
+                    statusLabel.ForeColor = Color.LightGreen;
                 }
             }
             catch (Exception ex)
             {
-                statusLabel.Text = "Error: " + ex.Message;
+                statusLabel.Text = "STATUS: ERROR - " + ex.Message;
+                statusLabel.ForeColor = Color.Red;
             }
         }
     }
