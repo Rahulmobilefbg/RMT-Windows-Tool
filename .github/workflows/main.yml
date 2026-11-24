@@ -1,29 +1,29 @@
-name: RMT Windows Build
+name: Build RMT Native
 
 on:
-workflow_dispatch:
-push:
-branches:
-- main
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
-build:
-runs-on: windows-latest
+  build:
+    runs-on: windows-latest
 
-steps:
-- name: Checkout
-uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-- name: Setup .NET
-uses: actions/setup-dotnet@v4
-with:
-dotnet-version: 8.0.x
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
-- name: Build RMT
-run: dotnet publish RMTNative.csproj -c Release -r win-x64 --self-contained true
+      - name: Build RMT
+        run: dotnet publish src/RMTNative.csproj -c Release -r win-x64 --self-contained true
 
-- name: Upload EXE
-uses: actions/upload-artifact@v4
-with:
-name: RMT-Windows
-path: bin/Release/net8.0/win-x64/publish/
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: RMT-Windows
+          path: src/bin/Release/net8.0/win-x64/publish/
