@@ -1,3 +1,4 @@
+
 name: Build RMT Native
 
 on:
@@ -26,4 +27,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: RMT-Windows
-          path: src/bin/Release/net8.0/win-x64/publish/
+          path: src/bin/Release/net8.0-windows/win-x64/publish/
