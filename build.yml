@@ -1,0 +1,23 @@
+name: Build RMT Windows EXE
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Publish standalone EXE
+        run: dotnet publish RMTNative.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+        # project files at repository root
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RMT-Windows-EXE
+          path: src/bin/Release/net8.0-windows/win-x64/publish/
